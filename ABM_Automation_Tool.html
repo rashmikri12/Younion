@@ -1,6 +1,9 @@
 <!DOCTYPE html>
-<html>
+<html lang="en">
 <head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>ABM Automation Tool</title>
   <script src="https://unpkg.com/react@18/umd/react.development.js"></script>
   <script src="https://unpkg.com/react-dom@18/umd/react-dom.development.js"></script>
   <script src="https://unpkg.com/@babel/standalone/babel.min.js"></script>
@@ -11,25 +14,25 @@
   <script type="text/babel">
     import { useState, useRef, useEffect } from "react";
 
-// â”€â”€â”€ CONSTANTS â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
+// ─── CONSTANTS ────────────────────────────────────────────────────────────────
 
 const STAGES = [
-  { id: "snapshot",    label: "Account Snapshot",        icon: "ðŸ¢", color: "#3B82F6" },
-  { id: "entity",      label: "AI / Tech Entity",         icon: "ðŸ¤–", color: "#8B5CF6" },
-  { id: "stack",       label: "Technology Stack",         icon: "âš™ï¸",  color: "#06B6D4" },
-  { id: "stakeholders",label: "Buying Group",             icon: "ðŸ‘¥", color: "#10B981" },
-  { id: "signals",     label: "Buying Signals",           icon: "ðŸ“¡", color: "#F59E0B" },
-  { id: "pains",       label: "Business Pains & AWS",     icon: "ðŸŽ¯", color: "#EF4444" },
-  { id: "competitive", label: "Competitive Landscape",    icon: "âš”ï¸",  color: "#EC4899" },
-  { id: "action",      label: "3-Week Action Plan",       icon: "ðŸš€", color: "#F97316" },
-  { id: "outreach",    label: "Outreach Emails",          icon: "âœ‰ï¸",  color: "#14B8A6" },
+  { id: "snapshot",    label: "Account Snapshot",        icon: "🏢", color: "#3B82F6" },
+  { id: "entity",      label: "AI / Tech Entity",         icon: "🤖", color: "#8B5CF6" },
+  { id: "stack",       label: "Technology Stack",         icon: "⚙️",  color: "#06B6D4" },
+  { id: "stakeholders",label: "Buying Group",             icon: "👥", color: "#10B981" },
+  { id: "signals",     label: "Buying Signals",           icon: "📡", color: "#F59E0B" },
+  { id: "pains",       label: "Business Pains & AWS",     icon: "🎯", color: "#EF4444" },
+  { id: "competitive", label: "Competitive Landscape",    icon: "⚔️",  color: "#EC4899" },
+  { id: "action",      label: "3-Week Action Plan",       icon: "🚀", color: "#F97316" },
+  { id: "outreach",    label: "Outreach Emails",          icon: "✉️",  color: "#14B8A6" },
 ];
 
-const SYSTEM_PROMPT = `You are an elite B2B account intelligence researcher for Younion Ã— AWS. 
+const SYSTEM_PROMPT = `You are an elite B2B account intelligence researcher for Younion × AWS. 
 You build Account Intelligence Profiles (AIPs) for enterprise sales teams.
-Your research is precise, sourced, and actionable. You write in clear human language â€” not jargon.
+Your research is precise, sourced, and actionable. You write in clear human language — not jargon.
 Every claim must be based on verifiable information. Flag uncertainty explicitly.
-Format all responses as clean JSON only â€” no markdown, no preamble, no explanation outside the JSON.`;
+Format all responses as clean JSON only — no markdown, no preamble, no explanation outside the JSON.`;
 
 const STAGE_PROMPTS = {
   snapshot: (company, url) => `Research this company and return ONLY valid JSON:
@@ -47,7 +50,7 @@ Return this exact JSON structure (fill every field with real researched data):
   "employees": "Total employee count",
   "hqAndPlants": "HQ location and major manufacturing/office locations",
   "globalFootprint": "Countries of operation and subsidiaries count",
-  "digitalMaturity": "HIGH/MEDIUM/LOW with evidence â€” cloud usage, tech team, digital initiatives",
+  "digitalMaturity": "HIGH/MEDIUM/LOW with evidence — cloud usage, tech team, digital initiatives",
   "keyFacts": ["3-5 most important facts about this company right now"],
   "sources": ["url1", "url2", "url3"]
 }`,
@@ -76,14 +79,14 @@ Return ONLY valid JSON:
       "layer": "e.g. Primary Cloud",
       "vendor": "Vendor name",
       "useCase": "What they use it for",
-      "depth": "DEEP/MODERATE/LIGHT â€” how embedded is this vendor",
+      "depth": "DEEP/MODERATE/LIGHT — how embedded is this vendor",
       "notes": "Key details, awards, certifications",
       "source": "url or document name"
     }
   ],
   "primaryCloud": "AWS / Azure / GCP / On-Prem / Hybrid",
   "cloudDepth": "How deeply is AWS already embedded?",
-  "keyPartners": "Main SIs â€” TCS, Infosys, Wipro etc",
+  "keyPartners": "Main SIs — TCS, Infosys, Wipro etc",
   "openOpportunities": "Where is the stack incomplete or ripe for extension?",
   "sources": ["url1", "url2"]
 }`,
@@ -94,7 +97,7 @@ Return ONLY valid JSON:
   "stakeholders": [
     {
       "role": "Economic Buyer / Champion / Influencer / Technical Evaluator / End User",
-      "name": "Full name and title â€” use 'Not identified' if unknown",
+      "name": "Full name and title — use 'Not identified' if unknown",
       "linkedIn": "LinkedIn URL if found",
       "influenceArea": "What decisions they influence",
       "howToEngage": "Specific engagement strategy for this person",
@@ -131,7 +134,7 @@ Return ONLY valid JSON:
     {
       "area": "Pain area name (e.g. EV Battery Analytics)",
       "pain": "2-3 sentences: what is happening, why it hurts, what they are missing. Use specific numbers and dates. No generic statements.",
-      "awsAnswer": "Specific AWS services and what outcome they deliver for this exact pain. Be concrete â€” name the services.",
+      "awsAnswer": "Specific AWS services and what outcome they deliver for this exact pain. Be concrete — name the services.",
       "urgency": "CRITICAL / HIGH / MEDIUM",
       "revenueImpact": "Estimated $ or % impact if you can find it",
       "source": "url or document name"
@@ -142,7 +145,7 @@ Return ONLY valid JSON:
   "sources": ["url1", "url2"]
 }`,
 
-  competitive: (company, url) => `Map the competitive technology landscape at ${company} (${url}) â€” who is already embedded, what they do, and how AWS should respond.
+  competitive: (company, url) => `Map the competitive technology landscape at ${company} (${url}) — who is already embedded, what they do, and how AWS should respond.
 Return ONLY valid JSON:
 {
   "competitors": [
@@ -150,7 +153,7 @@ Return ONLY valid JSON:
       "vendor": "Vendor name",
       "currentSituation": "What are they doing at this account right now? How embedded?",
       "threatLevel": "HIGH / MEDIUM / LOW / PARTNER",
-      "ourPlay": "Specific AWS response strategy â€” displace / co-exist / co-sell / extend",
+      "ourPlay": "Specific AWS response strategy — displace / co-exist / co-sell / extend",
       "source": "url"
     }
   ],
@@ -165,7 +168,7 @@ Return ONLY valid JSON:
 {
   "weeks": [
     {
-      "week": "Week 1 â€” Days 1-7",
+      "week": "Week 1 — Days 1-7",
       "theme": "Short theme name",
       "actions": [
         {
@@ -177,12 +180,12 @@ Return ONLY valid JSON:
       ]
     },
     {
-      "week": "Week 2 â€” Days 8-14",
+      "week": "Week 2 — Days 8-14",
       "theme": "Short theme name",
       "actions": []
     },
     {
-      "week": "Week 3 â€” Days 15-21",
+      "week": "Week 3 — Days 15-21",
       "theme": "Short theme name",
       "actions": []
     }
@@ -200,21 +203,21 @@ Return ONLY valid JSON:
       "target": "Role name (e.g. CEO of AI subsidiary)",
       "name": "Person's name if known, else role",
       "subject": "Email subject line",
-      "body": "Full email body â€” 150-200 words. Reference specific company facts. Do not use generic AI language. Sound like a thoughtful human who has done their homework.",
+      "body": "Full email body — 150-200 words. Reference specific company facts. Do not use generic AI language. Sound like a thoughtful human who has done their homework.",
       "tone": "Strategic / Technical / Urgency-led"
     }
   ],
   "linkedInMessages": [
     {
       "target": "Role name",
-      "message": "LinkedIn connection message â€” max 300 characters. Specific, not generic."
+      "message": "LinkedIn connection message — max 300 characters. Specific, not generic."
     }
   ],
   "coldCallOpener": "One sentence that would make the right person want to keep listening. Reference a specific recent event at the company."
 }`
 };
 
-// â”€â”€â”€ API CALL â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
+// ─── API CALL ─────────────────────────────────────────────────────────────────
 
 async function callClaude(prompt, previousContext = "") {
   const fullPrompt = previousContext
@@ -252,13 +255,13 @@ async function callClaude(prompt, previousContext = "") {
   }
 }
 
-// â”€â”€â”€ COMPONENTS â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
+// ─── COMPONENTS ───────────────────────────────────────────────────────────────
 
 const PriorityBadge = ({ priority }) => {
   const cfg = {
-    RED:      { bg: "#FEE2E2", color: "#991B1B", dot: "#EF4444", label: "ðŸ”´ Act Now" },
-    ORANGE:   { bg: "#FEF3C7", color: "#92400E", dot: "#F59E0B", label: "ðŸŸ  This Month" },
-    YELLOW:   { bg: "#FEF9C3", color: "#713F12", dot: "#EAB308", label: "ðŸŸ¡ Monitor" },
+    RED:      { bg: "#FEE2E2", color: "#991B1B", dot: "#EF4444", label: "🔴 Act Now" },
+    ORANGE:   { bg: "#FEF3C7", color: "#92400E", dot: "#F59E0B", label: "🟠 This Month" },
+    YELLOW:   { bg: "#FEF9C3", color: "#713F12", dot: "#EAB308", label: "🟡 Monitor" },
     CRITICAL: { bg: "#FEE2E2", color: "#991B1B", dot: "#EF4444", label: "Critical" },
     HIGH:     { bg: "#FEF3C7", color: "#92400E", dot: "#F59E0B", label: "High" },
     MEDIUM:   { bg: "#ECFDF5", color: "#065F46", dot: "#10B981", label: "Medium" },
@@ -307,11 +310,11 @@ const SignalCard = ({ signal }) => {
       </div>
       <p style={{ margin: "0 0 8px", fontSize: 13, color: "#475569", lineHeight: 1.6 }}>{signal.detail}</p>
       <div style={{ background: "#FFFFFF80", border: `1px solid ${c}30`, borderRadius: 6, padding: "8px 12px", fontSize: 12 }}>
-        <span style={{ fontWeight: 700, color: c }}>â†’ Action: </span>
+        <span style={{ fontWeight: 700, color: c }}>→ Action: </span>
         <span style={{ color: "#1E293B" }}>{signal.actionRequired}</span>
       </div>
       {signal.source && (
-        <div style={{ marginTop: 6, fontSize: 11, color: "#94A3B8" }}>ðŸ“Ž {signal.source}</div>
+        <div style={{ marginTop: 6, fontSize: 11, color: "#94A3B8" }}>📎 {signal.source}</div>
       )}
     </div>
   );
@@ -327,14 +330,14 @@ const PainCard = ({ pain }) => (
         </div>
         <p style={{ margin: 0, fontSize: 13, color: "#374151", lineHeight: 1.65 }}>{pain.pain}</p>
         {pain.revenueImpact && pain.revenueImpact !== "Not found" && (
-          <div style={{ marginTop: 10, fontSize: 12, color: "#6B7280", fontStyle: "italic" }}>ðŸ’° {pain.revenueImpact}</div>
+          <div style={{ marginTop: 10, fontSize: 12, color: "#6B7280", fontStyle: "italic" }}>💰 {pain.revenueImpact}</div>
         )}
       </div>
       <div style={{ padding: "16px 18px", background: "#F0FDF4" }}>
         <SectionLabel color="#10B981">AWS Answer</SectionLabel>
         <p style={{ margin: 0, fontSize: 13, color: "#1E293B", lineHeight: 1.65 }}>{pain.awsAnswer}</p>
         {pain.source && (
-          <div style={{ marginTop: 10, fontSize: 11, color: "#94A3B8" }}>ðŸ“Ž {pain.source}</div>
+          <div style={{ marginTop: 10, fontSize: 11, color: "#94A3B8" }}>📎 {pain.source}</div>
         )}
       </div>
     </div>
@@ -358,7 +361,7 @@ const EmailCard = ({ email }) => {
         <div style={{ display: "flex", gap: 8, alignItems: "center" }}>
           <span style={{ fontSize: 11, background: "#EFF6FF", color: "#3B82F6", padding: "3px 8px", borderRadius: 6, fontWeight: 600 }}>{email.tone}</span>
           <button onClick={copy} style={{ cursor: "pointer", background: copied ? "#DCFCE7" : "#F1F5F9", color: copied ? "#166534" : "#64748B", border: "none", padding: "6px 12px", borderRadius: 8, fontSize: 12, fontWeight: 700 }}>
-            {copied ? "âœ“ Copied" : "Copy"}
+            {copied ? "✓ Copied" : "Copy"}
           </button>
         </div>
       </div>
@@ -381,7 +384,7 @@ const LinkedInCard = ({ msg }) => {
           <span style={{ fontSize: 11, color: charCount > 280 ? "#EF4444" : "#94A3B8" }}>{charCount}/300 chars</span>
           <button onClick={() => { navigator.clipboard.writeText(msg.message); setCopied(true); setTimeout(() => setCopied(false), 2000); }}
             style={{ cursor: "pointer", background: copied ? "#DCFCE7" : "#DBEAFE", color: copied ? "#166534" : "#1E40AF", border: "none", padding: "4px 10px", borderRadius: 6, fontSize: 12, fontWeight: 700 }}>
-            {copied ? "âœ“" : "Copy"}
+            {copied ? "✓" : "Copy"}
           </button>
         </div>
       </div>
@@ -390,10 +393,10 @@ const LinkedInCard = ({ msg }) => {
   );
 };
 
-// â”€â”€â”€ RESULTS RENDERER â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
+// ─── RESULTS RENDERER ─────────────────────────────────────────────────────────
 
 function RenderResults({ stageId, data }) {
-  if (!data || data.error) return <div style={{ color: "#EF4444", fontSize: 13 }}>âš ï¸ {data?.error || "No data available"}</div>;
+  if (!data || data.error) return <div style={{ color: "#EF4444", fontSize: 13 }}>⚠️ {data?.error || "No data available"}</div>;
   if (data.raw) return <pre style={{ fontSize: 12, color: "#475569", whiteSpace: "pre-wrap", background: "#F8FAFC", padding: 14, borderRadius: 8 }}>{data.raw}</pre>;
 
   switch (stageId) {
@@ -410,9 +413,9 @@ function RenderResults({ stageId, data }) {
           </div>
           {data.segments && <Card><div style={{ fontSize: 12, color: "#94A3B8", fontWeight: 700, marginBottom: 6 }}>SEGMENT SPLIT</div><div style={{ fontSize: 13, color: "#374151" }}>{data.segments}</div></Card>}
           {data.legalEntities && <Card><div style={{ fontSize: 12, color: "#94A3B8", fontWeight: 700, marginBottom: 6 }}>LEGAL ENTITIES</div><div style={{ fontSize: 13, color: "#374151" }}>{data.legalEntities}</div></Card>}
-          {data.recentStructure && data.recentStructure !== "None found" && <Card style={{ borderLeft: "4px solid #F59E0B", background: "#FFFBEB" }}><div style={{ fontSize: 12, color: "#92400E", fontWeight: 700, marginBottom: 6 }}>âš¡ RECENT RESTRUCTURING</div><div style={{ fontSize: 13, color: "#374151" }}>{data.recentStructure}</div></Card>}
+          {data.recentStructure && data.recentStructure !== "None found" && <Card style={{ borderLeft: "4px solid #F59E0B", background: "#FFFBEB" }}><div style={{ fontSize: 12, color: "#92400E", fontWeight: 700, marginBottom: 6 }}>⚡ RECENT RESTRUCTURING</div><div style={{ fontSize: 13, color: "#374151" }}>{data.recentStructure}</div></Card>}
           {data.digitalMaturity && <Card><div style={{ fontSize: 12, color: "#94A3B8", fontWeight: 700, marginBottom: 6 }}>DIGITAL MATURITY</div><div style={{ fontSize: 13, color: "#374151" }}>{data.digitalMaturity}</div></Card>}
-          {data.keyFacts?.length > 0 && <Card><div style={{ fontSize: 12, color: "#94A3B8", fontWeight: 700, marginBottom: 8 }}>KEY FACTS</div>{data.keyFacts.map((f, i) => <div key={i} style={{ display: "flex", gap: 8, marginBottom: 6 }}><span style={{ color: "#3B82F6", fontWeight: 700 }}>â†’</span><span style={{ fontSize: 13, color: "#374151" }}>{f}</span></div>)}</Card>}
+          {data.keyFacts?.length > 0 && <Card><div style={{ fontSize: 12, color: "#94A3B8", fontWeight: 700, marginBottom: 8 }}>KEY FACTS</div>{data.keyFacts.map((f, i) => <div key={i} style={{ display: "flex", gap: 8, marginBottom: 6 }}><span style={{ color: "#3B82F6", fontWeight: 700 }}>→</span><span style={{ fontSize: 13, color: "#374151" }}>{f}</span></div>)}</Card>}
         </div>
       );
 
@@ -424,13 +427,13 @@ function RenderResults({ stageId, data }) {
             <div style={{ fontSize: 16, fontWeight: 800, color: "#1E293B", marginBottom: 4 }}>{data.entityName}</div>
             <div style={{ fontSize: 12, color: "#7C3AED" }}>{data.incorporated}</div>
           </Card>
-          {[["CEO", data.ceo], ["CTO", data.cto], ["CIN", data.cin], ["Capital & Status", data.capitalStatus], ["Core Focus", data.coreFocus?.join(" Â· ")], ["Vendor Deals on Record", data.vendorDealsOnRecord]].map(([k, v]) => v && (
+          {[["CEO", data.ceo], ["CTO", data.cto], ["CIN", data.cin], ["Capital & Status", data.capitalStatus], ["Core Focus", data.coreFocus?.join(" · ")], ["Vendor Deals on Record", data.vendorDealsOnRecord]].map(([k, v]) => v && (
             <div key={k} style={{ display: "grid", gridTemplateColumns: "160px 1fr", gap: 12, padding: "10px 0", borderBottom: "1px solid #F1F5F9", fontSize: 13 }}>
               <span style={{ fontWeight: 700, color: "#64748B" }}>{k}</span>
               <span style={{ color: "#1E293B" }}>{v}</span>
             </div>
           ))}
-          {data.urgencyNote && <Card style={{ marginTop: 14, background: "#FEF2F2", borderLeft: "4px solid #EF4444" }}><div style={{ fontSize: 12, color: "#991B1B", fontWeight: 700, marginBottom: 4 }}>âš¡ URGENCY NOTE</div><div style={{ fontSize: 13, color: "#374151" }}>{data.urgencyNote}</div></Card>}
+          {data.urgencyNote && <Card style={{ marginTop: 14, background: "#FEF2F2", borderLeft: "4px solid #EF4444" }}><div style={{ fontSize: 12, color: "#991B1B", fontWeight: 700, marginBottom: 4 }}>⚡ URGENCY NOTE</div><div style={{ fontSize: 13, color: "#374151" }}>{data.urgencyNote}</div></Card>}
         </div>
       );
 
@@ -440,7 +443,7 @@ function RenderResults({ stageId, data }) {
           <div style={{ background: "#EFF6FF", border: "1px solid #BFDBFE", borderRadius: 10, padding: "12px 16px", marginBottom: 14 }}>
             <span style={{ fontWeight: 700, color: "#1E40AF" }}>Primary Cloud: </span>
             <span style={{ color: "#1E293B" }}>{data.primaryCloud}</span>
-            {data.cloudDepth && <><span style={{ color: "#94A3B8", margin: "0 8px" }}>Â·</span><span style={{ color: "#475569", fontSize: 13 }}>{data.cloudDepth}</span></>}
+            {data.cloudDepth && <><span style={{ color: "#94A3B8", margin: "0 8px" }}>·</span><span style={{ color: "#475569", fontSize: 13 }}>{data.cloudDepth}</span></>}
           </div>
           <div style={{ border: "1px solid #E2E8F0", borderRadius: 10, overflow: "hidden", marginBottom: 14 }}>
             <div style={{ display: "grid", gridTemplateColumns: "160px 180px 1fr 100px", gap: 12, padding: "8px 14px", background: "#0F172A", fontSize: 11, fontWeight: 700, color: "#94A3B8", textTransform: "uppercase", letterSpacing: 1 }}>
@@ -448,14 +451,14 @@ function RenderResults({ stageId, data }) {
             </div>
             {data.stack?.map((item, i) => <StackRow key={i} item={item} i={i} />)}
           </div>
-          {data.openOpportunities && <Card style={{ background: "#F0FDF4", borderLeft: "4px solid #10B981" }}><div style={{ fontSize: 12, color: "#065F46", fontWeight: 700, marginBottom: 6 }}>ðŸŽ¯ OPEN OPPORTUNITIES</div><div style={{ fontSize: 13, color: "#374151" }}>{data.openOpportunities}</div></Card>}
+          {data.openOpportunities && <Card style={{ background: "#F0FDF4", borderLeft: "4px solid #10B981" }}><div style={{ fontSize: 12, color: "#065F46", fontWeight: 700, marginBottom: 6 }}>🎯 OPEN OPPORTUNITIES</div><div style={{ fontSize: 13, color: "#374151" }}>{data.openOpportunities}</div></Card>}
         </div>
       );
 
     case "stakeholders":
       return (
         <div>
-          {data.entryPoint && <Card style={{ background: "#FFFBEB", borderLeft: "4px solid #F59E0B" }}><div style={{ fontSize: 12, color: "#92400E", fontWeight: 700, marginBottom: 4 }}>ðŸŽ¯ ENTRY POINT</div><div style={{ fontSize: 13, color: "#374151" }}>{data.entryPoint}</div></Card>}
+          {data.entryPoint && <Card style={{ background: "#FFFBEB", borderLeft: "4px solid #F59E0B" }}><div style={{ fontSize: 12, color: "#92400E", fontWeight: 700, marginBottom: 4 }}>🎯 ENTRY POINT</div><div style={{ fontSize: 13, color: "#374151" }}>{data.entryPoint}</div></Card>}
           {data.stakeholders?.map((s, i) => (
             <Card key={i}>
               <div style={{ display: "flex", justifyContent: "space-between", alignItems: "flex-start", marginBottom: 10 }}>
@@ -469,10 +472,10 @@ function RenderResults({ stageId, data }) {
                 <div><div style={{ fontSize: 11, color: "#94A3B8", fontWeight: 700, marginBottom: 4 }}>INFLUENCE AREA</div><div style={{ fontSize: 13, color: "#475569" }}>{s.influenceArea}</div></div>
                 <div style={{ background: "#F0FDF4", borderRadius: 8, padding: "10px 12px" }}><div style={{ fontSize: 11, color: "#10B981", fontWeight: 700, marginBottom: 4 }}>HOW TO ENGAGE</div><div style={{ fontSize: 13, color: "#374151" }}>{s.howToEngage}</div></div>
               </div>
-              {s.linkedIn && s.linkedIn !== "Not found" && <div style={{ marginTop: 8, fontSize: 12, color: "#3B82F6" }}>ðŸ”— {s.linkedIn}</div>}
+              {s.linkedIn && s.linkedIn !== "Not found" && <div style={{ marginTop: 8, fontSize: 12, color: "#3B82F6" }}>🔗 {s.linkedIn}</div>}
             </Card>
           ))}
-          {data.warmIntroPath && <Card style={{ background: "#EFF6FF" }}><div style={{ fontSize: 12, color: "#1E40AF", fontWeight: 700, marginBottom: 4 }}>ðŸ¤ WARM INTRO PATH</div><div style={{ fontSize: 13, color: "#374151" }}>{data.warmIntroPath}</div></Card>}
+          {data.warmIntroPath && <Card style={{ background: "#EFF6FF" }}><div style={{ fontSize: 12, color: "#1E40AF", fontWeight: 700, marginBottom: 4 }}>🤝 WARM INTRO PATH</div><div style={{ fontSize: 13, color: "#374151" }}>{data.warmIntroPath}</div></Card>}
         </div>
       );
 
@@ -491,22 +494,22 @@ function RenderResults({ stageId, data }) {
     case "pains":
       return (
         <div>
-          {data.biggestWin && <Card style={{ borderLeft: "4px solid #10B981", background: "#F0FDF4" }}><div style={{ fontSize: 12, color: "#065F46", fontWeight: 700, marginBottom: 4 }}>ðŸ† FASTEST PATH TO A DEAL</div><div style={{ fontSize: 13, color: "#374151" }}>{data.biggestWin}</div></Card>}
+          {data.biggestWin && <Card style={{ borderLeft: "4px solid #10B981", background: "#F0FDF4" }}><div style={{ fontSize: 12, color: "#065F46", fontWeight: 700, marginBottom: 4 }}>🏆 FASTEST PATH TO A DEAL</div><div style={{ fontSize: 13, color: "#374151" }}>{data.biggestWin}</div></Card>}
           {data.pains?.map((p, i) => (
             <div key={i}>
               <div style={{ fontWeight: 800, fontSize: 15, color: "#0F172A", marginBottom: 8, paddingLeft: 4 }}>{i + 1}. {p.area}</div>
               <PainCard pain={p} />
             </div>
           ))}
-          {data.pocSuggestion && <Card style={{ borderLeft: "4px solid #8B5CF6", background: "#FAF5FF" }}><div style={{ fontSize: 12, color: "#7C3AED", fontWeight: 700, marginBottom: 4 }}>ðŸ’¡ SUGGESTED POC (30 DAYS)</div><div style={{ fontSize: 13, color: "#374151" }}>{data.pocSuggestion}</div></Card>}
+          {data.pocSuggestion && <Card style={{ borderLeft: "4px solid #8B5CF6", background: "#FAF5FF" }}><div style={{ fontSize: 12, color: "#7C3AED", fontWeight: 700, marginBottom: 4 }}>💡 SUGGESTED POC (30 DAYS)</div><div style={{ fontSize: 13, color: "#374151" }}>{data.pocSuggestion}</div></Card>}
         </div>
       );
 
     case "competitive":
       return (
         <div>
-          {data.biggestThreat && <Card style={{ background: "#FEF2F2", borderLeft: "4px solid #EF4444" }}><div style={{ fontSize: 12, color: "#991B1B", fontWeight: 700, marginBottom: 4 }}>âš ï¸ BIGGEST THREAT</div><div style={{ fontSize: 13, color: "#374151" }}>{data.biggestThreat}</div></Card>}
-          {data.biggestAlly && <Card style={{ background: "#ECFDF5", borderLeft: "4px solid #10B981" }}><div style={{ fontSize: 12, color: "#065F46", fontWeight: 700, marginBottom: 4 }}>ðŸ¤ BEST CO-SELL ALLY</div><div style={{ fontSize: 13, color: "#374151" }}>{data.biggestAlly}</div></Card>}
+          {data.biggestThreat && <Card style={{ background: "#FEF2F2", borderLeft: "4px solid #EF4444" }}><div style={{ fontSize: 12, color: "#991B1B", fontWeight: 700, marginBottom: 4 }}>⚠️ BIGGEST THREAT</div><div style={{ fontSize: 13, color: "#374151" }}>{data.biggestThreat}</div></Card>}
+          {data.biggestAlly && <Card style={{ background: "#ECFDF5", borderLeft: "4px solid #10B981" }}><div style={{ fontSize: 12, color: "#065F46", fontWeight: 700, marginBottom: 4 }}>🤝 BEST CO-SELL ALLY</div><div style={{ fontSize: 13, color: "#374151" }}>{data.biggestAlly}</div></Card>}
           {data.competitors?.map((c, i) => (
             <Card key={i}>
               <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: 10 }}>
@@ -540,7 +543,7 @@ function RenderResults({ stageId, data }) {
                       <span style={{ minWidth: 60, fontSize: 11, fontWeight: 700, color: a.priority === "MUST DO" ? "#EF4444" : "#94A3B8", background: a.priority === "MUST DO" ? "#FEE2E2" : "#F1F5F9", padding: "2px 6px", borderRadius: 4, height: "fit-content", marginTop: 1 }}>{a.priority}</span>
                       <div style={{ flex: 1 }}>
                         <div style={{ fontSize: 13, color: "#1E293B", marginBottom: 3 }}>{a.action}</div>
-                        <div style={{ fontSize: 11, color: "#94A3B8" }}>{a.owner} Â· {a.day}</div>
+                        <div style={{ fontSize: 11, color: "#94A3B8" }}>{a.owner} · {a.day}</div>
                       </div>
                     </div>
                   ))}
@@ -558,19 +561,19 @@ function RenderResults({ stageId, data }) {
         <div>
           {data.coldCallOpener && (
             <Card style={{ background: "#0F172A", border: "1px solid #1E293B" }}>
-              <div style={{ fontSize: 11, color: "#64748B", fontWeight: 700, marginBottom: 8, textTransform: "uppercase", letterSpacing: 1 }}>ðŸ“ž Cold Call Opener</div>
+              <div style={{ fontSize: 11, color: "#64748B", fontWeight: 700, marginBottom: 8, textTransform: "uppercase", letterSpacing: 1 }}>📞 Cold Call Opener</div>
               <div style={{ fontSize: 15, color: "#F8FAFC", fontWeight: 600, lineHeight: 1.6, fontStyle: "italic" }}>"{data.coldCallOpener}"</div>
             </Card>
           )}
           {data.emails?.length > 0 && (
             <div>
-              <div style={{ fontSize: 12, fontWeight: 700, color: "#64748B", textTransform: "uppercase", letterSpacing: 1, margin: "16px 0 10px" }}>ðŸ“§ Email Templates</div>
+              <div style={{ fontSize: 12, fontWeight: 700, color: "#64748B", textTransform: "uppercase", letterSpacing: 1, margin: "16px 0 10px" }}>📧 Email Templates</div>
               {data.emails.map((e, i) => <EmailCard key={i} email={e} />)}
             </div>
           )}
           {data.linkedInMessages?.length > 0 && (
             <div>
-              <div style={{ fontSize: 12, fontWeight: 700, color: "#1E40AF", textTransform: "uppercase", letterSpacing: 1, margin: "16px 0 10px" }}>ðŸ”— LinkedIn Messages</div>
+              <div style={{ fontSize: 12, fontWeight: 700, color: "#1E40AF", textTransform: "uppercase", letterSpacing: 1, margin: "16px 0 10px" }}>🔗 LinkedIn Messages</div>
               {data.linkedInMessages.map((m, i) => <LinkedInCard key={i} msg={m} />)}
             </div>
           )}
@@ -582,7 +585,7 @@ function RenderResults({ stageId, data }) {
   }
 }
 
-// â”€â”€â”€ MAIN APP â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
+// ─── MAIN APP ─────────────────────────────────────────────────────────────────
 
 export default function App() {
   const [company, setCompany] = useState("");
@@ -650,9 +653,9 @@ export default function App() {
       {/* Header */}
       <div style={{ background: "#0F172A", padding: "0 24px", borderBottom: "1px solid #1E293B", display: "flex", alignItems: "center", justifyContent: "space-between", height: 56, flexShrink: 0 }}>
         <div style={{ display: "flex", alignItems: "center", gap: 10 }}>
-          <div style={{ width: 28, height: 28, background: "linear-gradient(135deg, #3B82F6, #8B5CF6)", borderRadius: 8, display: "flex", alignItems: "center", justifyContent: "center", fontSize: 14 }}>ðŸŽ¯</div>
+          <div style={{ width: 28, height: 28, background: "linear-gradient(135deg, #3B82F6, #8B5CF6)", borderRadius: 8, display: "flex", alignItems: "center", justifyContent: "center", fontSize: 14 }}>🎯</div>
           <span style={{ color: "#F8FAFC", fontWeight: 800, fontSize: 15, letterSpacing: -0.3 }}>ABM Research Engine</span>
-          <span style={{ color: "#475569", fontSize: 12 }}>Younion Ã— AWS</span>
+          <span style={{ color: "#475569", fontSize: 12 }}>Younion × AWS</span>
         </div>
         {running && (
           <div style={{ display: "flex", alignItems: "center", gap: 8 }}>
@@ -661,7 +664,7 @@ export default function App() {
             <button onClick={stop} style={{ cursor: "pointer", background: "#DC2626", color: "#fff", border: "none", padding: "4px 12px", borderRadius: 6, fontSize: 12, fontWeight: 700 }}>Stop</button>
           </div>
         )}
-        {done && <span style={{ color: "#10B981", fontSize: 13, fontWeight: 700 }}>âœ“ Profile complete â€” {company}</span>}
+        {done && <span style={{ color: "#10B981", fontSize: 13, fontWeight: 700 }}>✓ Profile complete — {company}</span>}
       </div>
 
       <div style={{ display: "flex", flex: 1, overflow: "hidden" }}>
@@ -697,7 +700,7 @@ export default function App() {
                 transition: "all 0.2s"
               }}
             >
-              {running ? "â¹ Stop Research" : "â–¶ Generate Profile"}
+              {running ? "⏹ Stop Research" : "▶ Generate Profile"}
             </button>
           </div>
 
@@ -724,8 +727,8 @@ export default function App() {
                     {stage.label}
                   </span>
                   {isActive && <div style={{ width: 16, height: 16, border: `2px solid ${stage.color}`, borderTopColor: "transparent", borderRadius: "50%", animation: "spin 0.8s linear infinite" }} />}
-                  {status === "done" && !isActive && <span style={{ color: "#10B981", fontSize: 14 }}>âœ“</span>}
-                  {status === "error" && <span style={{ color: "#EF4444", fontSize: 14 }}>âœ—</span>}
+                  {status === "done" && !isActive && <span style={{ color: "#10B981", fontSize: 14 }}>✓</span>}
+                  {status === "error" && <span style={{ color: "#EF4444", fontSize: 14 }}>✗</span>}
                 </button>
               );
             })}
@@ -748,7 +751,7 @@ export default function App() {
           {/* Empty state */}
           {!running && !done && (
             <div style={{ display: "flex", flexDirection: "column", alignItems: "center", justifyContent: "center", height: "100%", textAlign: "center", color: "#94A3B8" }}>
-              <div style={{ fontSize: 56, marginBottom: 20 }}>ðŸŽ¯</div>
+              <div style={{ fontSize: 56, marginBottom: 20 }}>🎯</div>
               <div style={{ fontSize: 22, fontWeight: 800, color: "#1E293B", marginBottom: 8 }}>ABM Research Engine</div>
               <div style={{ fontSize: 15, color: "#64748B", maxWidth: 420, lineHeight: 1.7 }}>
                 Enter a company name and website URL, then click Generate Profile. The engine will research all 9 sections automatically using live web data.
@@ -766,7 +769,7 @@ export default function App() {
             <div style={{ display: "flex", alignItems: "center", justifyContent: "center", height: "100%" }}>
               <div style={{ textAlign: "center" }}>
                 <div style={{ width: 48, height: 48, border: "4px solid #E2E8F0", borderTopColor: "#3B82F6", borderRadius: "50%", animation: "spin 0.8s linear infinite", margin: "0 auto 16px" }} />
-                <div style={{ fontSize: 15, color: "#64748B" }}>Researching {company}â€¦</div>
+                <div style={{ fontSize: 15, color: "#64748B" }}>Researching {company}…</div>
               </div>
             </div>
           )}
@@ -784,15 +787,15 @@ export default function App() {
                       <div style={{ width: 44, height: 44, background: stage.color + "18", borderRadius: 12, display: "flex", alignItems: "center", justifyContent: "center", fontSize: 22 }}>{stage.icon}</div>
                       <div>
                         <div style={{ fontSize: 20, fontWeight: 900, color: "#0F172A" }}>{stage.label}</div>
-                        <div style={{ fontSize: 13, color: "#64748B" }}>{company}{url ? ` Â· ${url}` : ""}</div>
+                        <div style={{ fontSize: 13, color: "#64748B" }}>{company}{url ? ` · ${url}` : ""}</div>
                       </div>
                       {status === "running" && (
                         <div style={{ marginLeft: "auto", display: "flex", alignItems: "center", gap: 8 }}>
                           <div style={{ width: 16, height: 16, border: `2px solid ${stage.color}`, borderTopColor: "transparent", borderRadius: "50%", animation: "spin 0.8s linear infinite" }} />
-                          <span style={{ fontSize: 13, color: stage.color, fontWeight: 600 }}>Researchingâ€¦</span>
+                          <span style={{ fontSize: 13, color: stage.color, fontWeight: 600 }}>Researching…</span>
                         </div>
                       )}
-                      {status === "done" && <span style={{ marginLeft: "auto", fontSize: 13, color: "#10B981", fontWeight: 700 }}>âœ“ Complete</span>}
+                      {status === "done" && <span style={{ marginLeft: "auto", fontSize: 13, color: "#10B981", fontWeight: 700 }}>✓ Complete</span>}
                     </div>
                     {status === "running" && !data && (
                       <div style={{ display: "flex", gap: 10, flexDirection: "column" }}>
@@ -822,9 +825,7 @@ export default function App() {
     </div>
   );
 }
-    function App() {
-      return <h1>Hello!</h1>;
-    }
+    // Make sure your last line renders the app, like:
     ReactDOM.createRoot(document.getElementById('root')).render(<App />);
   </script>
 </body>
